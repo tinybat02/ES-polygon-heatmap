@@ -6,7 +6,7 @@ import { Style, Fill } from 'ol/style';
 import { Frame, GeoJSON } from '../types';
 
 const percentageToHsl = (percentage: number) => {
-  const hue = percentage * -80 + 100;
+  const hue = percentage * -120 + 120;
   return 'hsla(' + hue + ', 100%, 50%, 0.3)';
 };
 
@@ -43,11 +43,13 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
   const min = Math.min(...heatValues);
   const range = max - min;
 
+  console.log('max - min ', max, min, range);
   const polygons: Feature[] = [];
 
   geojson.features.map(feature => {
     if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
       const percentage = (assignValueToStore[feature.properties.name] - min) / range;
+      console.log('inside ', assignValueToStore[feature.properties.name], percentage);
       polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
     }
   });

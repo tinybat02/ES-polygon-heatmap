@@ -55520,7 +55520,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var percentageToHsl = function percentageToHsl(percentage) {
-  var hue = percentage * -80 + 100;
+  var hue = percentage * -120 + 120;
   return 'hsla(' + hue + ', 100%, 50%, 0.3)';
 };
 
@@ -55555,10 +55555,12 @@ var createHeatLayer = function createHeatLayer(series, geojson) {
   var max = Math.max.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var min = Math.min.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var range = max - min;
+  console.log('max - min ', max, min, range);
   var polygons = [];
   geojson.features.map(function (feature) {
     if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
       var percentage = (assignValueToStore[feature.properties.name] - min) / range;
+      console.log('inside ', assignValueToStore[feature.properties.name], percentage);
       polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
     }
   });
