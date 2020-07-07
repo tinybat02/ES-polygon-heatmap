@@ -7,6 +7,9 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
 import { defaults, DragPan, MouseWheelZoom } from 'ol/interaction';
 import { platformModifierKeyOnly } from 'ol/events/condition';
+import Select from 'ol/interaction/Select';
+import { Style, Text, Stroke, Fill } from 'ol/style';
+import { pointerMove } from 'ol/events/condition';
 import { createHeatLayer } from './utils/helpers';
 import { nanoid } from 'nanoid';
 import 'ol/ol.css';
@@ -64,6 +67,35 @@ export class MainPanel extends PureComponent<Props, State> {
         this.map.addLayer(this.heatLayer);
       }
     }
+
+    const hoverInteraction = new Select({
+      condition: pointerMove,
+      style: function(feature) {
+        const style: { [key: string]: any[] } = {};
+        const geometry_type = feature.getGeometry().getType();
+
+        style['Polygon'] = [
+          new Style({
+            fill: new Fill({
+              color: feature.get('color'),
+            }),
+          }),
+          new Style({
+            text: new Text({
+              stroke: new Stroke({
+                color: '#fff',
+                width: 2,
+              }),
+              font: '18px Calibri,sans-serif',
+              text: feature.get('value'),
+            }),
+          }),
+        ];
+
+        return style[geometry_type];
+      },
+    });
+    this.map.addInteraction(hoverInteraction);
   }
 
   componentDidUpdate(prevProps: Props) {

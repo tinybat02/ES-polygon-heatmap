@@ -10,11 +10,13 @@ const percentageToHsl = (percentage: number) => {
   return 'hsla(' + hue + ', 100%, 50%, 0.3)';
 };
 
-const createPolygon = (coordinates: number[][][], color: string) => {
+const createPolygon = (coordinates: number[][][], value: string, color: string) => {
   const polygonFeature = new Feature({
     type: 'Polygon',
     geometry: new Polygon(coordinates).transform('EPSG:4326', 'EPSG:3857'),
   });
+  polygonFeature.set('value', value);
+  polygonFeature.set('color', color);
   polygonFeature.setStyle(
     new Style({
       fill: new Fill({
@@ -26,20 +28,56 @@ const createPolygon = (coordinates: number[][][], color: string) => {
 };
 
 export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
-  // const heatValues: number[] = [];
+  const heatValues: number[] = [];
   const stores: string[] = [];
   const assignValueToStore: { [key: string]: number } = {};
-  const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
-  const assignPolygonToStore: { [key: string]: number[][][] } = {};
+  // const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
+  // const assignPolygonToStore: { [key: string]: number[][][] } = {};
+
+  series.map(item => {
+    const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
+    heatValues.push(sumValue);
+    if (item.name) {
+      stores.push(item.name);
+      assignValueToStore[item.name] = sumValue;
+    }
+  });
+
+  const max = Math.max(...heatValues);
+  const min = Math.min(...heatValues);
+  const range = max - min;
+
+  const polygons: Feature[] = [];
+
+  geojson.features.map(feature => {
+    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
+      const percentage = (assignValueToStore[feature.properties.name] - min) / range;
+      polygons.push(
+        createPolygon(
+          feature.geometry.coordinates,
+          assignValueToStore[feature.properties.name].toString(),
+          percentageToHsl(percentage)
+        )
+      );
+    }
+  });
 
   // series.map(item => {
   //   const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-  //   heatValues.push(sumValue);
   //   if (item.name) {
   //     stores.push(item.name);
   //     assignValueToStore[item.name] = sumValue;
   //   }
   // });
+
+  // geojson.features.map(feature => {
+  //   if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
+  //     assignValueToStoreCurrentFloor[feature.properties.name] = assignValueToStore[feature.properties.name];
+  //     assignPolygonToStore[feature.properties.name] = feature.geometry.coordinates;
+  //   }
+  // });
+
+  // const heatValues = Object.values(assignValueToStoreCurrentFloor);
 
   // const max = Math.max(...heatValues);
   // const min = Math.min(...heatValues);
@@ -47,47 +85,16 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
 
   // const polygons: Feature[] = [];
 
-  // geojson.features.map(feature => {
-  //   if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-  //     const percentage = (assignValueToStore[feature.properties.name] - min) / range;
-  //     polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
-  //   }
+  // Object.keys(assignValueToStoreCurrentFloor).map(storeName => {
+  //   const percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
+  //   polygons.push(
+  //     createPolygon(
+  //       assignPolygonToStore[storeName],
+  //       assignValueToStoreCurrentFloor[storeName],
+  //       percentageToHsl(percentage)
+  //     )
+  //   );
   // });
-
-  series.map(item => {
-    const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-    if (item.name) {
-      stores.push(item.name);
-      assignValueToStore[item.name] = sumValue;
-    }
-  });
-
-  geojson.features.map(feature => {
-    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-      assignValueToStoreCurrentFloor[feature.properties.name] = assignValueToStore[feature.properties.name];
-      assignPolygonToStore[feature.properties.name] = feature.geometry.coordinates;
-    }
-  });
-
-  const heatValues = Object.values(assignValueToStoreCurrentFloor);
-
-  // const max = Math.max(...heatValues);
-  const max = 492;
-  const min = Math.min(...heatValues);
-  const range = max - min;
-
-  const polygons: Feature[] = [];
-
-  Object.keys(assignValueToStoreCurrentFloor).map(storeName => {
-    let percentage = 0;
-    if (assignValueToStoreCurrentFloor[storeName] < 492) {
-      percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
-    } else {
-      percentage = 1;
-    }
-
-    polygons.push(createPolygon(assignPolygonToStore[storeName], percentageToHsl(percentage)));
-  });
 
   return new VectorLayer({
     source: new VectorSource({

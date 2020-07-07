@@ -55274,10 +55274,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ol_proj__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ol/proj */ "../node_modules/ol/proj.js");
 /* harmony import */ var ol_interaction__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ol/interaction */ "../node_modules/ol/interaction.js");
 /* harmony import */ var ol_events_condition__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ol/events/condition */ "../node_modules/ol/events/condition.js");
-/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/helpers */ "./utils/helpers.ts");
-/* harmony import */ var nanoid__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! nanoid */ "../node_modules/nanoid/index.browser.js");
-/* harmony import */ var ol_ol_css__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ol/ol.css */ "../node_modules/ol/ol.css");
-/* harmony import */ var ol_ol_css__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(ol_ol_css__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var ol_interaction_Select__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ol/interaction/Select */ "../node_modules/ol/interaction/Select.js");
+/* harmony import */ var ol_style__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ol/style */ "../node_modules/ol/style.js");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./utils/helpers */ "./utils/helpers.ts");
+/* harmony import */ var nanoid__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! nanoid */ "../node_modules/nanoid/index.browser.js");
+/* harmony import */ var ol_ol_css__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ol/ol.css */ "../node_modules/ol/ol.css");
+/* harmony import */ var ol_ol_css__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(ol_ol_css__WEBPACK_IMPORTED_MODULE_12__);
+
+
+
 
 
 
@@ -55298,7 +55303,7 @@ function (_super) {
   function MainPanel() {
     var _this = _super !== null && _super.apply(this, arguments) || this;
 
-    _this.id = 'id' + Object(nanoid__WEBPACK_IMPORTED_MODULE_9__["nanoid"])();
+    _this.id = 'id' + Object(nanoid__WEBPACK_IMPORTED_MODULE_11__["nanoid"])();
     return _this;
   }
 
@@ -55345,17 +55350,41 @@ function (_super) {
 
     if (this.props.data.series.length > 0) {
       if (this.props.options.geojson) {
-        this.heatLayer = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_8__["createHeatLayer"])(this.props.data.series, this.props.options.geojson);
+        this.heatLayer = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_10__["createHeatLayer"])(this.props.data.series, this.props.options.geojson);
         this.map.addLayer(this.heatLayer);
       }
     }
+
+    var hoverInteraction = new ol_interaction_Select__WEBPACK_IMPORTED_MODULE_8__["default"]({
+      condition: ol_events_condition__WEBPACK_IMPORTED_MODULE_7__["pointerMove"],
+      style: function style(feature) {
+        var style = {};
+        var geometry_type = feature.getGeometry().getType();
+        style['Polygon'] = [new ol_style__WEBPACK_IMPORTED_MODULE_9__["Style"]({
+          fill: new ol_style__WEBPACK_IMPORTED_MODULE_9__["Fill"]({
+            color: feature.get('color')
+          })
+        }), new ol_style__WEBPACK_IMPORTED_MODULE_9__["Style"]({
+          text: new ol_style__WEBPACK_IMPORTED_MODULE_9__["Text"]({
+            stroke: new ol_style__WEBPACK_IMPORTED_MODULE_9__["Stroke"]({
+              color: '#fff',
+              width: 2
+            }),
+            font: '18px Calibri,sans-serif',
+            text: feature.get('value')
+          })
+        })];
+        return style[geometry_type];
+      }
+    });
+    this.map.addInteraction(hoverInteraction);
   };
 
   MainPanel.prototype.componentDidUpdate = function (prevProps) {
     if (prevProps.data.series !== this.props.data.series) {
       if (this.props.options.geojson) {
         this.map.removeLayer(this.heatLayer);
-        this.heatLayer = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_8__["createHeatLayer"])(this.props.data.series, this.props.options.geojson);
+        this.heatLayer = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_10__["createHeatLayer"])(this.props.data.series, this.props.options.geojson);
         this.map.addLayer(this.heatLayer);
       }
     }
@@ -55524,11 +55553,13 @@ var percentageToHsl = function percentageToHsl(percentage) {
   return 'hsla(' + hue + ', 100%, 50%, 0.3)';
 };
 
-var createPolygon = function createPolygon(coordinates, color) {
+var createPolygon = function createPolygon(coordinates, value, color) {
   var polygonFeature = new ol_Feature__WEBPACK_IMPORTED_MODULE_3__["default"]({
     type: 'Polygon',
     geometry: new ol_geom_Polygon__WEBPACK_IMPORTED_MODULE_4__["default"](coordinates).transform('EPSG:4326', 'EPSG:3857')
   });
+  polygonFeature.set('value', value);
+  polygonFeature.set('color', color);
   polygonFeature.setStyle(new ol_style__WEBPACK_IMPORTED_MODULE_5__["Style"]({
     fill: new ol_style__WEBPACK_IMPORTED_MODULE_5__["Fill"]({
       color: color
@@ -55538,62 +55569,60 @@ var createPolygon = function createPolygon(coordinates, color) {
 };
 
 var createHeatLayer = function createHeatLayer(series, geojson) {
-  // const heatValues: number[] = [];
+  var heatValues = [];
   var stores = [];
-  var assignValueToStore = {};
-  var assignValueToStoreCurrentFloor = {};
-  var assignPolygonToStore = {}; // series.map(item => {
-  //   const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-  //   heatValues.push(sumValue);
-  //   if (item.name) {
-  //     stores.push(item.name);
-  //     assignValueToStore[item.name] = sumValue;
-  //   }
-  // });
-  // const max = Math.max(...heatValues);
-  // const min = Math.min(...heatValues);
-  // const range = max - min;
-  // const polygons: Feature[] = [];
-  // geojson.features.map(feature => {
-  //   if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-  //     const percentage = (assignValueToStore[feature.properties.name] - min) / range;
-  //     polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
-  //   }
-  // });
+  var assignValueToStore = {}; // const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
+  // const assignPolygonToStore: { [key: string]: number[][][] } = {};
 
   series.map(function (item) {
     var sumValue = item.fields[0].values.buffer.reduce(function (sum, elm) {
       return sum + elm;
     }, 0);
+    heatValues.push(sumValue);
 
     if (item.name) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
     }
   });
-  geojson.features.map(function (feature) {
-    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-      assignValueToStoreCurrentFloor[feature.properties.name] = assignValueToStore[feature.properties.name];
-      assignPolygonToStore[feature.properties.name] = feature.geometry.coordinates;
-    }
-  });
-  var heatValues = Object.values(assignValueToStoreCurrentFloor); // const max = Math.max(...heatValues);
-
-  var max = 492;
+  var max = Math.max.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var min = Math.min.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var range = max - min;
   var polygons = [];
-  Object.keys(assignValueToStoreCurrentFloor).map(function (storeName) {
-    var percentage = 0;
-
-    if (assignValueToStoreCurrentFloor[storeName] < 492) {
-      percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
-    } else {
-      percentage = 1;
+  geojson.features.map(function (feature) {
+    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
+      var percentage = (assignValueToStore[feature.properties.name] - min) / range;
+      polygons.push(createPolygon(feature.geometry.coordinates, assignValueToStore[feature.properties.name].toString(), percentageToHsl(percentage)));
     }
+  }); // series.map(item => {
+  //   const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
+  //   if (item.name) {
+  //     stores.push(item.name);
+  //     assignValueToStore[item.name] = sumValue;
+  //   }
+  // });
+  // geojson.features.map(feature => {
+  //   if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
+  //     assignValueToStoreCurrentFloor[feature.properties.name] = assignValueToStore[feature.properties.name];
+  //     assignPolygonToStore[feature.properties.name] = feature.geometry.coordinates;
+  //   }
+  // });
+  // const heatValues = Object.values(assignValueToStoreCurrentFloor);
+  // const max = Math.max(...heatValues);
+  // const min = Math.min(...heatValues);
+  // const range = max - min;
+  // const polygons: Feature[] = [];
+  // Object.keys(assignValueToStoreCurrentFloor).map(storeName => {
+  //   const percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
+  //   polygons.push(
+  //     createPolygon(
+  //       assignPolygonToStore[storeName],
+  //       assignValueToStoreCurrentFloor[storeName],
+  //       percentageToHsl(percentage)
+  //     )
+  //   );
+  // });
 
-    polygons.push(createPolygon(assignPolygonToStore[storeName], percentageToHsl(percentage)));
-  });
   return new ol_layer__WEBPACK_IMPORTED_MODULE_1__["Vector"]({
     source: new ol_source_Vector__WEBPACK_IMPORTED_MODULE_2__["default"]({
       features: polygons
