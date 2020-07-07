@@ -31,10 +31,11 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
   const assignValueToStore: { [key: string]: number } = {};
 
   series.map(item => {
-    heatValues.push(item.fields[0].values.buffer[0]);
+    const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
+    heatValues.push(sumValue);
     if (item.name) {
       stores.push(item.name);
-      assignValueToStore[item.name] = item.fields[0].values.buffer[0];
+      assignValueToStore[item.name] = sumValue;
     }
   });
 
