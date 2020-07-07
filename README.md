@@ -1,8 +1,6 @@
-# Simple React Panel
+# ES poylgon heatmap
 
-This is just a stub to show how you can create a basic visualization plugin.
-
-First, install dependencies:
+Visualize polygon by heatmap color
 
 ```BASH
 yarn install
