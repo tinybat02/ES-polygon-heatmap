@@ -55569,29 +55569,30 @@ var createPolygon = function createPolygon(coordinates, value, color) {
 };
 
 var createHeatLayer = function createHeatLayer(series, geojson) {
-  var heatValues = [];
   var stores = [];
-  var assignValueToStore = {}; // const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
+  var assignValueToStore = {};
+  var assignValueToStoreLog = {}; // const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
   // const assignPolygonToStore: { [key: string]: number[][][] } = {};
 
   series.map(function (item) {
     var sumValue = item.fields[0].values.buffer.reduce(function (sum, elm) {
       return sum + elm;
     }, 0);
-    heatValues.push(sumValue);
 
     if (item.name) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
+      assignValueToStoreLog[item.name] = Math.log2(sumValue);
     }
   });
+  var heatValues = Object.values(assignValueToStoreLog);
   var max = Math.max.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var min = Math.min.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var range = max - min;
   var polygons = [];
   geojson.features.map(function (feature) {
     if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-      var percentage = (assignValueToStore[feature.properties.name] - min) / range;
+      var percentage = (assignValueToStoreLog[feature.properties.name] - min) / range;
       polygons.push(createPolygon(feature.geometry.coordinates, assignValueToStore[feature.properties.name].toString(), percentageToHsl(percentage)));
     }
   }); // series.map(item => {

@@ -28,21 +28,22 @@ const createPolygon = (coordinates: number[][][], value: string, color: string) 
 };
 
 export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
-  const heatValues: number[] = [];
   const stores: string[] = [];
   const assignValueToStore: { [key: string]: number } = {};
+  const assignValueToStoreLog: { [key: string]: number } = {};
   // const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
   // const assignPolygonToStore: { [key: string]: number[][][] } = {};
 
   series.map(item => {
     const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-    heatValues.push(sumValue);
     if (item.name) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
+      assignValueToStoreLog[item.name] = Math.log2(sumValue);
     }
   });
 
+  const heatValues = Object.values(assignValueToStoreLog);
   const max = Math.max(...heatValues);
   const min = Math.min(...heatValues);
   const range = max - min;
@@ -51,7 +52,7 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
 
   geojson.features.map(feature => {
     if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-      const percentage = (assignValueToStore[feature.properties.name] - min) / range;
+      const percentage = (assignValueToStoreLog[feature.properties.name] - min) / range;
       polygons.push(
         createPolygon(
           feature.geometry.coordinates,
