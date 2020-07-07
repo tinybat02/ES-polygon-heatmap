@@ -55274,10 +55274,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ol_proj__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ol/proj */ "../node_modules/ol/proj.js");
 /* harmony import */ var ol_interaction__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ol/interaction */ "../node_modules/ol/interaction.js");
 /* harmony import */ var ol_events_condition__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ol/events/condition */ "../node_modules/ol/events/condition.js");
-/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/helpers */ "./utils/helpers.ts");
-/* harmony import */ var nanoid__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! nanoid */ "../node_modules/nanoid/index.browser.js");
-/* harmony import */ var ol_ol_css__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ol/ol.css */ "../node_modules/ol/ol.css");
-/* harmony import */ var ol_ol_css__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(ol_ol_css__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var nanoid__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! nanoid */ "../node_modules/nanoid/index.browser.js");
+/* harmony import */ var ol_ol_css__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ol/ol.css */ "../node_modules/ol/ol.css");
+/* harmony import */ var ol_ol_css__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(ol_ol_css__WEBPACK_IMPORTED_MODULE_9__);
 
 
 
@@ -55285,7 +55284,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
+ // import { createHeatLayer } from './utils/helpers';
 
 
 
@@ -55298,7 +55297,7 @@ function (_super) {
   function MainPanel() {
     var _this = _super !== null && _super.apply(this, arguments) || this;
 
-    _this.id = 'id' + Object(nanoid__WEBPACK_IMPORTED_MODULE_9__["nanoid"])();
+    _this.id = 'id' + Object(nanoid__WEBPACK_IMPORTED_MODULE_8__["nanoid"])();
     return _this;
   }
 
@@ -55344,49 +55343,47 @@ function (_super) {
     }
 
     if (this.props.data.series.length > 0) {
-      if (this.props.options.geojson) {
-        this.heatLayer = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_8__["createHeatLayer"])(this.props.data.series, this.props.options.geojson);
-        this.map.addLayer(this.heatLayer);
-      }
+      console.log('polygon heat ', this.props.data); // if (this.props.options.geojson) {
+      //   this.heatLayer = createHeatLayer(this.props.data.series as Frame[], this.props.options.geojson);
+      //   this.map.addLayer(this.heatLayer);
+      // }
     }
-  };
+  }; // componentDidUpdate(prevProps: Props) {
+  //   if (prevProps.data.series !== this.props.data.series) {
+  //     if (this.props.options.geojson) {
+  //       this.map.removeLayer(this.heatLayer);
+  //       this.heatLayer = createHeatLayer(this.props.data.series as Frame[], this.props.options.geojson);
+  //       this.map.addLayer(this.heatLayer);
+  //     }
+  //   }
+  //   if (prevProps.options.tile_url !== this.props.options.tile_url) {
+  //     if (this.randomTile) {
+  //       this.map.removeLayer(this.randomTile);
+  //     }
+  //     if (this.props.options.tile_url !== '') {
+  //       this.randomTile = new TileLayer({
+  //         source: new XYZ({
+  //           url: this.props.options.tile_url,
+  //         }),
+  //         zIndex: 1,
+  //       });
+  //       this.map.addLayer(this.randomTile);
+  //     }
+  //   }
+  //   if (prevProps.options.zoom_level !== this.props.options.zoom_level) {
+  //     this.map.getView().setZoom(this.props.options.zoom_level);
+  //   }
+  //   if (
+  //     prevProps.options.center_lat !== this.props.options.center_lat ||
+  //     prevProps.options.center_lon !== this.props.options.center_lon
+  //   ) {
+  //     this.map.getView().animate({
+  //       center: fromLonLat([this.props.options.center_lon, this.props.options.center_lat]),
+  //       duration: 2000,
+  //     });
+  //   }
+  // }
 
-  MainPanel.prototype.componentDidUpdate = function (prevProps) {
-    if (prevProps.data.series !== this.props.data.series) {
-      if (this.props.options.geojson) {
-        this.map.removeLayer(this.heatLayer);
-        this.heatLayer = Object(_utils_helpers__WEBPACK_IMPORTED_MODULE_8__["createHeatLayer"])(this.props.data.series, this.props.options.geojson);
-        this.map.addLayer(this.heatLayer);
-      }
-    }
-
-    if (prevProps.options.tile_url !== this.props.options.tile_url) {
-      if (this.randomTile) {
-        this.map.removeLayer(this.randomTile);
-      }
-
-      if (this.props.options.tile_url !== '') {
-        this.randomTile = new ol_layer__WEBPACK_IMPORTED_MODULE_4__["Tile"]({
-          source: new ol_source_XYZ__WEBPACK_IMPORTED_MODULE_3__["default"]({
-            url: this.props.options.tile_url
-          }),
-          zIndex: 1
-        });
-        this.map.addLayer(this.randomTile);
-      }
-    }
-
-    if (prevProps.options.zoom_level !== this.props.options.zoom_level) {
-      this.map.getView().setZoom(this.props.options.zoom_level);
-    }
-
-    if (prevProps.options.center_lat !== this.props.options.center_lat || prevProps.options.center_lon !== this.props.options.center_lon) {
-      this.map.getView().animate({
-        center: Object(ol_proj__WEBPACK_IMPORTED_MODULE_5__["fromLonLat"])([this.props.options.center_lon, this.props.options.center_lat]),
-        duration: 2000
-      });
-    }
-  };
 
   MainPanel.prototype.render = function () {
     var _a = this.props,
@@ -55492,79 +55489,6 @@ var defaults = {
   tile_url: '',
   zoom_level: 18,
   geojson: null
-};
-
-/***/ }),
-
-/***/ "./utils/helpers.ts":
-/*!**************************!*\
-  !*** ./utils/helpers.ts ***!
-  \**************************/
-/*! exports provided: createHeatLayer */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createHeatLayer", function() { return createHeatLayer; });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "../node_modules/tslib/tslib.es6.js");
-/* harmony import */ var ol_layer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ol/layer */ "../node_modules/ol/layer.js");
-/* harmony import */ var ol_source_Vector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ol/source/Vector */ "../node_modules/ol/source/Vector.js");
-/* harmony import */ var ol_Feature__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ol/Feature */ "../node_modules/ol/Feature.js");
-/* harmony import */ var ol_geom_Polygon__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ol/geom/Polygon */ "../node_modules/ol/geom/Polygon.js");
-/* harmony import */ var ol_style__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ol/style */ "../node_modules/ol/style.js");
-
-
-
-
-
-
-
-var percentageToHsl = function percentageToHsl(percentage) {
-  var hue = percentage * -80 + 100;
-  return 'hsla(' + hue + ', 100%, 50%, 0.3)';
-};
-
-var createPolygon = function createPolygon(coordinates, color) {
-  var polygonFeature = new ol_Feature__WEBPACK_IMPORTED_MODULE_3__["default"]({
-    type: 'Polygon',
-    geometry: new ol_geom_Polygon__WEBPACK_IMPORTED_MODULE_4__["default"](coordinates).transform('EPSG:4326', 'EPSG:3857')
-  });
-  polygonFeature.setStyle(new ol_style__WEBPACK_IMPORTED_MODULE_5__["Style"]({
-    fill: new ol_style__WEBPACK_IMPORTED_MODULE_5__["Fill"]({
-      color: color
-    })
-  }));
-  return polygonFeature;
-};
-
-var createHeatLayer = function createHeatLayer(series, geojson) {
-  var heatValues = [];
-  var stores = [];
-  var assignValueToStore = {};
-  series.map(function (item) {
-    heatValues.push(item.fields[0].values.buffer[0]);
-
-    if (item.name) {
-      stores.push(item.name);
-      assignValueToStore[item.name] = item.fields[0].values.buffer[0];
-    }
-  });
-  var max = Math.max.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
-  var min = Math.min.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
-  var range = max - min;
-  var polygons = [];
-  geojson.features.map(function (feature) {
-    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-      var percentage = (assignValueToStore[feature.properties.name] - min) / range;
-      polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
-    }
-  });
-  return new ol_layer__WEBPACK_IMPORTED_MODULE_1__["Vector"]({
-    source: new ol_source_Vector__WEBPACK_IMPORTED_MODULE_2__["default"]({
-      features: polygons
-    }),
-    zIndex: 2
-  });
 };
 
 /***/ }),

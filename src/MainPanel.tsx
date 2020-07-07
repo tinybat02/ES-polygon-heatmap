@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react';
 import { PanelProps } from '@grafana/data';
-import { PanelOptions, Frame } from 'types';
+import { PanelOptions /* , Frame */ } from 'types';
 import { Map, View } from 'ol';
 import XYZ from 'ol/source/XYZ';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { fromLonLat } from 'ol/proj';
 import { defaults, DragPan, MouseWheelZoom } from 'ol/interaction';
 import { platformModifierKeyOnly } from 'ol/events/condition';
-import { createHeatLayer } from './utils/helpers';
+// import { createHeatLayer } from './utils/helpers';
 import { nanoid } from 'nanoid';
 import 'ol/ol.css';
 
@@ -59,52 +59,53 @@ export class MainPanel extends PureComponent<Props, State> {
     }
 
     if (this.props.data.series.length > 0) {
-      if (this.props.options.geojson) {
-        this.heatLayer = createHeatLayer(this.props.data.series as Frame[], this.props.options.geojson);
-        this.map.addLayer(this.heatLayer);
-      }
+      console.log('polygon heat ', this.props.data);
+      // if (this.props.options.geojson) {
+      //   this.heatLayer = createHeatLayer(this.props.data.series as Frame[], this.props.options.geojson);
+      //   this.map.addLayer(this.heatLayer);
+      // }
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.data.series !== this.props.data.series) {
-      if (this.props.options.geojson) {
-        this.map.removeLayer(this.heatLayer);
+  // componentDidUpdate(prevProps: Props) {
+  //   if (prevProps.data.series !== this.props.data.series) {
+  //     if (this.props.options.geojson) {
+  //       this.map.removeLayer(this.heatLayer);
 
-        this.heatLayer = createHeatLayer(this.props.data.series as Frame[], this.props.options.geojson);
-        this.map.addLayer(this.heatLayer);
-      }
-    }
+  //       this.heatLayer = createHeatLayer(this.props.data.series as Frame[], this.props.options.geojson);
+  //       this.map.addLayer(this.heatLayer);
+  //     }
+  //   }
 
-    if (prevProps.options.tile_url !== this.props.options.tile_url) {
-      if (this.randomTile) {
-        this.map.removeLayer(this.randomTile);
-      }
-      if (this.props.options.tile_url !== '') {
-        this.randomTile = new TileLayer({
-          source: new XYZ({
-            url: this.props.options.tile_url,
-          }),
-          zIndex: 1,
-        });
-        this.map.addLayer(this.randomTile);
-      }
-    }
+  //   if (prevProps.options.tile_url !== this.props.options.tile_url) {
+  //     if (this.randomTile) {
+  //       this.map.removeLayer(this.randomTile);
+  //     }
+  //     if (this.props.options.tile_url !== '') {
+  //       this.randomTile = new TileLayer({
+  //         source: new XYZ({
+  //           url: this.props.options.tile_url,
+  //         }),
+  //         zIndex: 1,
+  //       });
+  //       this.map.addLayer(this.randomTile);
+  //     }
+  //   }
 
-    if (prevProps.options.zoom_level !== this.props.options.zoom_level) {
-      this.map.getView().setZoom(this.props.options.zoom_level);
-    }
+  //   if (prevProps.options.zoom_level !== this.props.options.zoom_level) {
+  //     this.map.getView().setZoom(this.props.options.zoom_level);
+  //   }
 
-    if (
-      prevProps.options.center_lat !== this.props.options.center_lat ||
-      prevProps.options.center_lon !== this.props.options.center_lon
-    ) {
-      this.map.getView().animate({
-        center: fromLonLat([this.props.options.center_lon, this.props.options.center_lat]),
-        duration: 2000,
-      });
-    }
-  }
+  //   if (
+  //     prevProps.options.center_lat !== this.props.options.center_lat ||
+  //     prevProps.options.center_lon !== this.props.options.center_lon
+  //   ) {
+  //     this.map.getView().animate({
+  //       center: fromLonLat([this.props.options.center_lon, this.props.options.center_lat]),
+  //       duration: 2000,
+  //     });
+  //   }
+  // }
 
   render() {
     const { width, height } = this.props;
