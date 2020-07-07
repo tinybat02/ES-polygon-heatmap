@@ -55538,31 +55538,53 @@ var createPolygon = function createPolygon(coordinates, color) {
 };
 
 var createHeatLayer = function createHeatLayer(series, geojson) {
-  var heatValues = [];
+  // const heatValues: number[] = [];
   var stores = [];
   var assignValueToStore = {};
+  var assignValueToStoreCurrentFloor = {};
+  var assignPolygonToStore = {}; // series.map(item => {
+  //   const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
+  //   heatValues.push(sumValue);
+  //   if (item.name) {
+  //     stores.push(item.name);
+  //     assignValueToStore[item.name] = sumValue;
+  //   }
+  // });
+  // const max = Math.max(...heatValues);
+  // const min = Math.min(...heatValues);
+  // const range = max - min;
+  // const polygons: Feature[] = [];
+  // geojson.features.map(feature => {
+  //   if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
+  //     const percentage = (assignValueToStore[feature.properties.name] - min) / range;
+  //     polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
+  //   }
+  // });
+
   series.map(function (item) {
     var sumValue = item.fields[0].values.buffer.reduce(function (sum, elm) {
       return sum + elm;
     }, 0);
-    heatValues.push(sumValue);
 
     if (item.name) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
     }
   });
+  geojson.features.map(function (feature) {
+    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
+      assignValueToStoreCurrentFloor[feature.properties.name] = assignValueToStore[feature.properties.name];
+      assignPolygonToStore[feature.properties.name] = feature.geometry.coordinates;
+    }
+  });
+  var heatValues = Object.values(assignValueToStoreCurrentFloor);
   var max = Math.max.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var min = Math.min.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var range = max - min;
-  console.log('max - min ', max, min, range);
   var polygons = [];
-  geojson.features.map(function (feature) {
-    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-      var percentage = (assignValueToStore[feature.properties.name] - min) / range;
-      console.log('inside ', assignValueToStore[feature.properties.name], percentage);
-      polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
-    }
+  Object.keys(assignValueToStoreCurrentFloor).map(function (storeName) {
+    var percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
+    polygons.push(createPolygon(assignPolygonToStore[storeName], percentageToHsl(percentage)));
   });
   return new ol_layer__WEBPACK_IMPORTED_MODULE_1__["Vector"]({
     source: new ol_source_Vector__WEBPACK_IMPORTED_MODULE_2__["default"]({

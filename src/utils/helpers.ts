@@ -26,32 +26,60 @@ const createPolygon = (coordinates: number[][][], color: string) => {
 };
 
 export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
-  const heatValues: number[] = [];
+  // const heatValues: number[] = [];
   const stores: string[] = [];
   const assignValueToStore: { [key: string]: number } = {};
+  const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
+  const assignPolygonToStore: { [key: string]: number[][][] } = {};
+
+  // series.map(item => {
+  //   const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
+  //   heatValues.push(sumValue);
+  //   if (item.name) {
+  //     stores.push(item.name);
+  //     assignValueToStore[item.name] = sumValue;
+  //   }
+  // });
+
+  // const max = Math.max(...heatValues);
+  // const min = Math.min(...heatValues);
+  // const range = max - min;
+
+  // const polygons: Feature[] = [];
+
+  // geojson.features.map(feature => {
+  //   if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
+  //     const percentage = (assignValueToStore[feature.properties.name] - min) / range;
+  //     polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
+  //   }
+  // });
 
   series.map(item => {
     const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-    heatValues.push(sumValue);
     if (item.name) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
     }
   });
 
+  geojson.features.map(feature => {
+    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
+      assignValueToStoreCurrentFloor[feature.properties.name] = assignValueToStore[feature.properties.name];
+      assignPolygonToStore[feature.properties.name] = feature.geometry.coordinates;
+    }
+  });
+
+  const heatValues = Object.values(assignValueToStoreCurrentFloor);
+
   const max = Math.max(...heatValues);
   const min = Math.min(...heatValues);
   const range = max - min;
 
-  console.log('max - min ', max, min, range);
   const polygons: Feature[] = [];
 
-  geojson.features.map(feature => {
-    if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-      const percentage = (assignValueToStore[feature.properties.name] - min) / range;
-      console.log('inside ', assignValueToStore[feature.properties.name], percentage);
-      polygons.push(createPolygon(feature.geometry.coordinates, percentageToHsl(percentage)));
-    }
+  Object.keys(assignValueToStoreCurrentFloor).map(storeName => {
+    const percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
+    polygons.push(createPolygon(assignPolygonToStore[storeName], percentageToHsl(percentage)));
   });
 
   return new VectorLayer({
