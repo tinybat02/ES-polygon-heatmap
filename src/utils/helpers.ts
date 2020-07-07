@@ -79,6 +79,7 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
 
   Object.keys(assignValueToStoreCurrentFloor).map(storeName => {
     const percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
+    console.log('debug ', assignValueToStoreCurrentFloor[storeName], percentage);
     polygons.push(createPolygon(assignPolygonToStore[storeName], percentageToHsl(percentage)));
   });
 

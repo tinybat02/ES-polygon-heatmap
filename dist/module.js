@@ -55584,6 +55584,7 @@ var createHeatLayer = function createHeatLayer(series, geojson) {
   var polygons = [];
   Object.keys(assignValueToStoreCurrentFloor).map(function (storeName) {
     var percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
+    console.log('debug ', assignValueToStoreCurrentFloor[storeName], percentage);
     polygons.push(createPolygon(assignPolygonToStore[storeName], percentageToHsl(percentage)));
   });
   return new ol_layer__WEBPACK_IMPORTED_MODULE_1__["Vector"]({
