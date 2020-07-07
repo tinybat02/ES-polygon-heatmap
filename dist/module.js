@@ -55577,14 +55577,21 @@ var createHeatLayer = function createHeatLayer(series, geojson) {
       assignPolygonToStore[feature.properties.name] = feature.geometry.coordinates;
     }
   });
-  var heatValues = Object.values(assignValueToStoreCurrentFloor);
-  var max = Math.max.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
+  var heatValues = Object.values(assignValueToStoreCurrentFloor); // const max = Math.max(...heatValues);
+
+  var max = 492;
   var min = Math.min.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
   var range = max - min;
   var polygons = [];
   Object.keys(assignValueToStoreCurrentFloor).map(function (storeName) {
-    var percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
-    console.log('debug ', assignValueToStoreCurrentFloor[storeName], percentage);
+    var percentage = 0;
+
+    if (assignValueToStoreCurrentFloor[storeName] < 492) {
+      percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
+    } else {
+      percentage = 1;
+    }
+
     polygons.push(createPolygon(assignPolygonToStore[storeName], percentageToHsl(percentage)));
   });
   return new ol_layer__WEBPACK_IMPORTED_MODULE_1__["Vector"]({

@@ -71,15 +71,21 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
 
   const heatValues = Object.values(assignValueToStoreCurrentFloor);
 
-  const max = Math.max(...heatValues);
+  // const max = Math.max(...heatValues);
+  const max = 492;
   const min = Math.min(...heatValues);
   const range = max - min;
 
   const polygons: Feature[] = [];
 
   Object.keys(assignValueToStoreCurrentFloor).map(storeName => {
-    const percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
-    console.log('debug ', assignValueToStoreCurrentFloor[storeName], percentage);
+    let percentage = 0;
+    if (assignValueToStoreCurrentFloor[storeName] < 492) {
+      percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
+    } else {
+      percentage = 1;
+    }
+
     polygons.push(createPolygon(assignPolygonToStore[storeName], percentageToHsl(percentage)));
   });
 
