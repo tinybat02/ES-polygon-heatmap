@@ -88,6 +88,7 @@ export class MainPanel extends PureComponent<Props, State> {
               }),
               font: '18px Calibri,sans-serif',
               text: feature.get('value'),
+              overflow: true,
             }),
           }),
         ];

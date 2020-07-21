@@ -55371,7 +55371,8 @@ function (_super) {
               width: 2
             }),
             font: '18px Calibri,sans-serif',
-            text: feature.get('value')
+            text: feature.get('value'),
+            overflow: true
           })
         })];
         return style[geometry_type];
