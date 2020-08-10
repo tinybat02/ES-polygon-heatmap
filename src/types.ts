@@ -1,5 +1,17 @@
 import { DataFrame, Field, Vector } from '@grafana/data';
 
+export interface FeatureGeojson {
+  type: string;
+  properties: {
+    [key: string]: string;
+    name: string;
+  };
+  geometry: {
+    type: string;
+    coordinates: number[][][];
+  };
+}
+
 export interface GeoJSON {
   features: Array<{
     type: string;

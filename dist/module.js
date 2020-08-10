@@ -55554,7 +55554,18 @@ var percentageToHsl = function percentageToHsl(percentage) {
   return 'hsla(' + hue + ', 100%, 50%, 0.3)';
 };
 
-var createPolygon = function createPolygon(coordinates, value, color) {
+var createPolygon = function createPolygon(
+/* coordinates: number[][][] */
+feature, value, color) {
+  var coordinates = [];
+
+  if (feature.geometry.type == 'Polygon') {
+    coordinates = feature.geometry.coordinates;
+  } else if (feature.geometry.type == 'LineString') {
+    // @ts-ignore
+    coordinates = [feature.geometry.coordinates];
+  }
+
   var polygonFeature = new ol_Feature__WEBPACK_IMPORTED_MODULE_3__["default"]({
     type: 'Polygon',
     geometry: new ol_geom_Polygon__WEBPACK_IMPORTED_MODULE_4__["default"](coordinates).transform('EPSG:4326', 'EPSG:3857')
@@ -55580,7 +55591,7 @@ var createHeatLayer = function createHeatLayer(series, geojson) {
       return sum + elm;
     }, 0);
 
-    if (item.name) {
+    if (item.name && sumValue > 3) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
       assignValueToStoreLog[item.name] = Math.log2(sumValue);
@@ -55594,7 +55605,8 @@ var createHeatLayer = function createHeatLayer(series, geojson) {
   geojson.features.map(function (feature) {
     if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
       var percentage = (assignValueToStoreLog[feature.properties.name] - min) / range;
-      polygons.push(createPolygon(feature.geometry.coordinates, assignValueToStore[feature.properties.name].toString(), percentageToHsl(percentage)));
+      polygons.push(createPolygon( // feature.geometry.coordinates,
+      feature, assignValueToStore[feature.properties.name].toString(), percentageToHsl(percentage)));
     }
   }); // series.map(item => {
   //   const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);

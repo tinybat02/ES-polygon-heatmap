@@ -3,14 +3,21 @@ import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
 import { Style, Fill } from 'ol/style';
-import { Frame, GeoJSON } from '../types';
+import { Frame, GeoJSON, FeatureGeojson } from '../types';
 
 const percentageToHsl = (percentage: number) => {
   const hue = percentage * -120 + 120;
   return 'hsla(' + hue + ', 100%, 50%, 0.3)';
 };
 
-const createPolygon = (coordinates: number[][][], value: string, color: string) => {
+const createPolygon = (/* coordinates: number[][][] */ feature: FeatureGeojson, value: string, color: string) => {
+  let coordinates: number[][][] = [];
+  if (feature.geometry.type == 'Polygon') {
+    coordinates = feature.geometry.coordinates;
+  } else if (feature.geometry.type == 'LineString') {
+    // @ts-ignore
+    coordinates = [feature.geometry.coordinates];
+  }
   const polygonFeature = new Feature({
     type: 'Polygon',
     geometry: new Polygon(coordinates).transform('EPSG:4326', 'EPSG:3857'),
@@ -36,7 +43,7 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
 
   series.map(item => {
     const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-    if (item.name) {
+    if (item.name && sumValue > 3) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
       assignValueToStoreLog[item.name] = Math.log2(sumValue);
@@ -55,7 +62,8 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
       const percentage = (assignValueToStoreLog[feature.properties.name] - min) / range;
       polygons.push(
         createPolygon(
-          feature.geometry.coordinates,
+          // feature.geometry.coordinates,
+          feature,
           assignValueToStore[feature.properties.name].toString(),
           percentageToHsl(percentage)
         )
