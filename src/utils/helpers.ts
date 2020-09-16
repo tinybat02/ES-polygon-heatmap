@@ -41,7 +41,7 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
 
   series.map(item => {
     const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-    if (item.name /* && sumValue > 3 */) {
+    if (item.name && sumValue > 3) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
       assignValueToStoreLog[item.name] = Math.log2(sumValue);

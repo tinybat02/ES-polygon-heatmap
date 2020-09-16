@@ -55589,13 +55589,11 @@ var createHeatLayer = function createHeatLayer(series, geojson) {
       return sum + elm;
     }, 0);
 
-    if (item.name
-    /* && sumValue > 3 */
-    ) {
-        stores.push(item.name);
-        assignValueToStore[item.name] = sumValue;
-        assignValueToStoreLog[item.name] = Math.log2(sumValue);
-      }
+    if (item.name && sumValue > 3) {
+      stores.push(item.name);
+      assignValueToStore[item.name] = sumValue;
+      assignValueToStoreLog[item.name] = Math.log2(sumValue);
+    }
   });
   var heatValues = Object.values(assignValueToStoreLog);
   var max = Math.max.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
