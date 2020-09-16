@@ -40,10 +40,9 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
   const assignValueToStoreLog: { [key: string]: number } = {};
   // const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
   // const assignPolygonToStore: { [key: string]: number[][][] } = {};
-
   series.map(item => {
     const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-    if (item.name && sumValue > 3) {
+    if (item.name /* && sumValue > 3 */) {
       stores.push(item.name);
       assignValueToStore[item.name] = sumValue;
       assignValueToStoreLog[item.name] = Math.log2(sumValue);
@@ -65,7 +64,7 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
           // feature.geometry.coordinates,
           feature,
           assignValueToStore[feature.properties.name].toString(),
-          percentageToHsl(percentage)
+          range != 0 ? percentageToHsl(percentage) : 'hsla(49, 100%, 50%, 0.3)'
         )
       );
     }

@@ -55591,11 +55591,13 @@ var createHeatLayer = function createHeatLayer(series, geojson) {
       return sum + elm;
     }, 0);
 
-    if (item.name && sumValue > 3) {
-      stores.push(item.name);
-      assignValueToStore[item.name] = sumValue;
-      assignValueToStoreLog[item.name] = Math.log2(sumValue);
-    }
+    if (item.name
+    /* && sumValue > 3 */
+    ) {
+        stores.push(item.name);
+        assignValueToStore[item.name] = sumValue;
+        assignValueToStoreLog[item.name] = Math.log2(sumValue);
+      }
   });
   var heatValues = Object.values(assignValueToStoreLog);
   var max = Math.max.apply(Math, Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(heatValues));
@@ -55606,7 +55608,7 @@ var createHeatLayer = function createHeatLayer(series, geojson) {
     if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
       var percentage = (assignValueToStoreLog[feature.properties.name] - min) / range;
       polygons.push(createPolygon( // feature.geometry.coordinates,
-      feature, assignValueToStore[feature.properties.name].toString(), percentageToHsl(percentage)));
+      feature, assignValueToStore[feature.properties.name].toString(), range != 0 ? percentageToHsl(percentage) : 'hsla(49, 100%, 50%, 0.3)'));
     }
   }); // series.map(item => {
   //   const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
