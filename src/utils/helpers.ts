@@ -38,8 +38,7 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
   const stores: string[] = [];
   const assignValueToStore: { [key: string]: number } = {};
   const assignValueToStoreLog: { [key: string]: number } = {};
-  // const assignValueToStoreCurrentFloor: { [key: string]: number } = {};
-  // const assignPolygonToStore: { [key: string]: number[][][] } = {};
+
   series.map(item => {
     const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
     if (item.name /* && sumValue > 3 */) {
@@ -61,7 +60,6 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
       const percentage = (assignValueToStoreLog[feature.properties.name] - min) / range;
       polygons.push(
         createPolygon(
-          // feature.geometry.coordinates,
           feature,
           assignValueToStore[feature.properties.name].toString(),
           range != 0 ? percentageToHsl(percentage) : 'hsla(49, 100%, 50%, 0.3)'
@@ -69,40 +67,6 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
       );
     }
   });
-
-  // series.map(item => {
-  //   const sumValue = item.fields[0].values.buffer.reduce((sum, elm) => sum + elm, 0);
-  //   if (item.name) {
-  //     stores.push(item.name);
-  //     assignValueToStore[item.name] = sumValue;
-  //   }
-  // });
-
-  // geojson.features.map(feature => {
-  //   if (feature.properties && feature.properties.name && stores.includes(feature.properties.name)) {
-  //     assignValueToStoreCurrentFloor[feature.properties.name] = assignValueToStore[feature.properties.name];
-  //     assignPolygonToStore[feature.properties.name] = feature.geometry.coordinates;
-  //   }
-  // });
-
-  // const heatValues = Object.values(assignValueToStoreCurrentFloor);
-
-  // const max = Math.max(...heatValues);
-  // const min = Math.min(...heatValues);
-  // const range = max - min;
-
-  // const polygons: Feature[] = [];
-
-  // Object.keys(assignValueToStoreCurrentFloor).map(storeName => {
-  //   const percentage = (assignValueToStoreCurrentFloor[storeName] - min) / range;
-  //   polygons.push(
-  //     createPolygon(
-  //       assignPolygonToStore[storeName],
-  //       assignValueToStoreCurrentFloor[storeName],
-  //       percentageToHsl(percentage)
-  //     )
-  //   );
-  // });
 
   return new VectorLayer({
     source: new VectorSource({
