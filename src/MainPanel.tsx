@@ -13,6 +13,7 @@ import { pointerMove } from 'ol/events/condition';
 import { createHeatLayer } from './utils/helpers';
 import { nanoid } from 'nanoid';
 import 'ol/ol.css';
+import './main.css';
 
 interface Props extends PanelProps<PanelOptions> {}
 interface State {}
@@ -141,6 +142,22 @@ export class MainPanel extends PureComponent<Props, State> {
   render() {
     const { width, height } = this.props;
 
-    return <div id={this.id} style={{ width, height }}></div>;
+    return (
+      <>
+        <div id={this.id} style={{ width, height }}></div>
+        <div className="p-legend">
+          <h4>Intensity Area</h4>
+          <div className="row">
+            <div className="square" style={{ background: 'hsla(120, 100%, 50%, 0.3)' }}></div> <span>Few </span>
+          </div>
+          <div className="row">
+            <div className="square" style={{ background: 'hsla(60, 100%, 50%, 0.3)' }}></div> <span>Medium </span>
+          </div>
+          <div className="row">
+            <div className="square" style={{ background: 'hsla(0, 100%, 50%, 0.3)' }}></div> <span>Large </span>
+          </div>
+        </div>
+      </>
+    );
   }
 }
