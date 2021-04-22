@@ -61,7 +61,7 @@ export const createHeatLayer = (series: Frame[], geojson: GeoJSON) => {
       polygons.push(
         createPolygon(
           feature,
-          assignValueToStore[feature.properties.name].toString(),
+          feature.properties.name + ' : ' + assignValueToStore[feature.properties.name],
           range != 0 ? percentageToHsl(percentage) : 'hsla(49, 100%, 50%, 0.3)'
         )
       );
