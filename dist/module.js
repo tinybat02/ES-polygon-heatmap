@@ -55393,11 +55393,12 @@ var MainEditor = function MainEditor(_a) {
   var handleChange = function handleChange(e) {
     var _a = e.target,
         name = _a.name,
-        value = _a.value;
+        value = _a.value,
+        type = _a.type;
     setInputs(function (prevState) {
       var _a;
 
-      return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, prevState), (_a = {}, _a[name] = value, _a));
+      return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, prevState), (_a = {}, _a[name] = type == 'number' ? Number(value) : value, _a));
     });
   };
 
@@ -55613,6 +55614,11 @@ function (_super) {
         url: 'https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
       })
     });
+    var min = Object(ol_proj__WEBPACK_IMPORTED_MODULE_5__["fromLonLat"])([center_lon - 0.02, center_lat - 0.02]);
+    var max = Object(ol_proj__WEBPACK_IMPORTED_MODULE_5__["fromLonLat"])([center_lon + 0.02, center_lat + 0.02]);
+
+    var extent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(min, max);
+
     this.map = new ol__WEBPACK_IMPORTED_MODULE_2__["Map"]({
       interactions: Object(ol_interaction__WEBPACK_IMPORTED_MODULE_6__["defaults"])({
         dragPan: false,
@@ -55628,7 +55634,8 @@ function (_super) {
       layers: [carto],
       view: new ol__WEBPACK_IMPORTED_MODULE_2__["View"]({
         center: Object(ol_proj__WEBPACK_IMPORTED_MODULE_5__["fromLonLat"])([center_lon, center_lat]),
-        zoom: zoom_level
+        zoom: zoom_level,
+        extent: extent
       }),
       target: this.id
     });
