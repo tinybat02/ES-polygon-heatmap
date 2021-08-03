@@ -55616,9 +55616,11 @@ function (_super) {
       source: new ol_source_XYZ__WEBPACK_IMPORTED_MODULE_3__["default"]({
         url: 'https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
       })
-    }); // const min = fromLonLat([center_lon - 0.02, center_lat - 0.02]);
-    // const max = fromLonLat([center_lon + 0.02, center_lat + 0.02]);
-    // const extent = [...min, ...max] as [number, number, number, number];
+    });
+    var min = Object(ol_proj__WEBPACK_IMPORTED_MODULE_5__["fromLonLat"])([center_lon - 0.02, center_lat - 0.02]);
+    var max = Object(ol_proj__WEBPACK_IMPORTED_MODULE_5__["fromLonLat"])([center_lon + 0.02, center_lat + 0.02]);
+
+    var extent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])(min, max);
 
     this.map = new ol__WEBPACK_IMPORTED_MODULE_2__["Map"]({
       interactions: Object(ol_interaction__WEBPACK_IMPORTED_MODULE_6__["defaults"])({
@@ -55635,7 +55637,8 @@ function (_super) {
       layers: [carto],
       view: new ol__WEBPACK_IMPORTED_MODULE_2__["View"]({
         center: Object(ol_proj__WEBPACK_IMPORTED_MODULE_5__["fromLonLat"])([center_lon, center_lat]),
-        zoom: zoom_level
+        zoom: zoom_level,
+        extent: extent
       }),
       target: this.id
     });
