@@ -59,6 +59,8 @@ export const MainEditor: React.FC<PanelEditorProps<PanelOptions>> = ({ options, 
 
     reader.onloadend = function() {
       const obj = JSON.parse(reader.result as string);
+
+      setInputs({ ...inputs, geojson: obj });
       onOptionsChange({
         ...options,
         geojson: obj,

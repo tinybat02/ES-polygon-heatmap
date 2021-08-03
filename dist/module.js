@@ -55444,6 +55444,9 @@ var MainEditor = function MainEditor(_a) {
 
     reader.onloadend = function () {
       var obj = JSON.parse(reader.result);
+      setInputs(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, inputs), {
+        geojson: obj
+      }));
       onOptionsChange(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])(Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"])({}, options), {
         geojson: obj
       }));
